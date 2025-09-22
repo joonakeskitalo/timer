@@ -10,7 +10,7 @@ async fn create_window(app: tauri::AppHandle) {
     .build()
     .unwrap();
 
-    webview_window.set_size(Size::Logical(LogicalSize { width: 480.0, height: 255.0})).unwrap()
+    webview_window.set_size(Size::Logical(LogicalSize { width: 480.0, height: 230.0})).unwrap()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
