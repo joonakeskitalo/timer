@@ -1,5 +1,7 @@
 # Timer
 
+<img width="1010" height="456" alt="timer" src="https://github.com/user-attachments/assets/745af616-4ff3-4ef5-8ddb-e7557fbada74" />
+
 Simple timer & alarm app in one. You can set the desired duration of a timer or the time when the alarm will end.
 
 ## Hotkeys
