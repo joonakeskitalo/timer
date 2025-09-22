@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timer</title>
+
+    <style>
+      :root {
+        --color-text: rgb(37, 37, 37);
+        --color-text-dim: #a1a1a1;
+        --color-text-dim2: rgb(195, 194, 194);
+        --color-background: white;
+        --color-button: #e9e9e9;
+        --font-family: Lexend, Inter, Roboto, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+          sans-serif;
+      }
+      *:focus {
+        outline: none;
+      }
+
+      body {
+        font-family: var(--font-family);
+        background-color: var(--color-background);
+        color: var(--color-text);
+        overflow: hidden;
+      }
+
+      input,
+      textarea {
+        background-color: var(--color-background);
+        color: var(--color-text);
+        border: var(--color-text-dim);
+      }
+
+      input:not([type="range"]) {
+        padding: 0.5em 1em;
+        width: 100%;
+        background-color: var(--color-background);
+      }
+
+      input[type="number"] {
+        font-family: var(--font-family);
+        border: none;
+        margin: 0.15em 0.25em;
+        font-size: 10pt;
+        background-color: var(--color-background);
+        background-color: #f2f2f2;
+        padding: 10px 8px;
+        text-align: center;
+        border-radius: 0.5em;
+      }
+
+      button {
+        border: none;
+        font-size: 10pt;
+        border-radius: 0.2em;
+        border: none;
+        padding: 0.3em 0.55em;
+        margin: 0.1em;
+        text-align: center;
+        text-decoration: none;
+        outline: none;
+        width: auto;
+        transition: background-color 0.15s ease-out;
+        font-family: var(--font-family);
+        background-color: #f2f2f2;
+        color: var(--color-text);
+      }
+
+      button:hover {
+        background-color: var(--color-text-dim2);
+      }
+
+      textarea {
+        resize: none;
+        font-family: var(--font-family);
+        font-size: 12pt;
+        border: 1px solid var(--color-text-dim2);
+      }
+
+      .container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        max-width: 500px;
+        margin: auto;
+        gap: 32px;
+        user-select: none;
+        -webkit-user-select: none;
+        cursor: default;
+
+        & > div {
+          min-width: 200px;
+        }
+      }
+
+      .container-time {
+        width: 100%;
+        height: 100%;
+        max-width: 175px;
+
+        & > div {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+      }
+
+      .large-clock {
+        & > div {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+        }
+
+        & span {
+          font-size: 14pt;
+          font-family: "B612 Mono", monospace;
+        }
+
+        & b {
+          font-size: 9pt;
+          color: var(--color-text-dim);
+        }
+      }
+
+      .container-controls {
+        height: 100%;
+        max-width: 250px;
+        user-select: none;
+
+        & > div {
+          margin: 0.5em 0;
+        }
+      }
+
+      .timer-buttons {
+        width: 100%;
+        max-height: 155px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        & > button {
+          flex: 1 0 23%;
+        }
+      }
+
+      .blink {
+        animation: bgblink 1s ease-in-out infinite;
+      }
+
+      .result-display {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      span,
+      b {
+        color: var(--color-text);
+        font-size: 11pt;
+      }
+
+      @keyframes bgblink {
+        from {
+          background-color: var(--color-background);
+        }
+
+        50% {
+          background-color: #aed6b8;
+        }
+
+        to {
+          background-color: var(--color-background);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="container-time">
+        <div class="large-clock">
+          <div>
+            <span id="hoursSpan">0</span>
+            <b>Hours</b>
+          </div>
+          <div>
+            <span id="minutesSpan">0</span>
+            <b>Minutes</b>
+          </div>
+          <div>
+            <span id="secondsSpan">0</span>
+            <b>Seconds</b>
+          </div>
+        </div>
+        <div style="height: 5px"></div>
+        <div>
+          <progress
+            style="width: 100%"
+            id="timerProgressIndicator"
+            max="100"
+            value="0"
+          ></progress>
+        </div>
+
+        <div style="display: none">
+          <input
+            style="width: 100%"
+            type="range"
+            value="0"
+            min="0"
+            max="45"
+            id="selectTimeRange"
+          />
+          <span id="selectTimeRangeSpan"></span>
+        </div>
+
+        <span style="font-size: 8pt; font-weight: 600; margin-left: 7px"
+          >Timer</span
+        >
+        <div>
+          <input
+            placeholder="Hours..."
+            type="number"
+            min="0"
+            name=""
+            id="timerHours"
+            list="alarm-hours"
+          />
+          <input
+            placeholder="Minutes…"
+            type="number"
+            min="0"
+            name=""
+            id="timerMinutes"
+            list="alarm-minutes"
+          />
+        </div>
+
+        <span style="font-size: 8pt; font-weight: 600; margin-left: 7px"
+          >Alarm</span
+        >
+        <div>
+          <input
+            placeholder="Hours..."
+            type="number"
+            name=""
+            min="0"
+            id="alarmHours"
+            list="alarm-hours"
+          />
+
+          <datalist id="alarm-hours">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="17">17</option>
+            <option value="18">18</option>
+            <option value="19">19</option>
+            <option value="20">20</option>
+            <option value="21">21</option>
+            <option value="22">22</option>
+            <option value="23">23</option>
+          </datalist>
+
+          <input
+            placeholder="Minutes…"
+            type="number"
+            name=""
+            min="0"
+            id="alarmMinutes"
+            list="alarm-minutes"
+          />
+
+          <datalist id="alarm-minutes">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="25">25</option>
+            <option value="30">30</option>
+            <option value="35">35</option>
+            <option value="40">40</option>
+            <option value="45">45</option>
+            <option value="50">50</option>
+            <option value="55">55</option>
+            <option value="58">58</option>
+          </datalist>
+        </div>
+      </div>
+
+      <div class="container-controls">
+        <div style="display: flex">
+          <textarea
+            style="width: 100%; margin: 0 0.1em; font-size: 11pt"
+            id="noteTextArea"
+            spellcheck="false"
+            name=""
+            rows="2"
+            placeholder="Note…"
+            q
+          ></textarea>
+        </div>
+
+        <div class="timer-buttons">
+          <button onclick="timer.startWithMinutes(2)">2m</button>
+          <button onclick="timer.startWithMinutes(5)">5m</button>
+          <button onclick="timer.startWithMinutes(10)">10m</button>
+          <button onclick="timer.startWithMinutes(15)">15m</button>
+          <button onclick="timer.startWithMinutes(25)">25m</button>
+          <button onclick="timer.startWithMinutes(30)">30m</button>
+          <button onclick="timer.startWithMinutes(45)">45m</button>
+          <button onclick="timer.startWithMinutes(60)">60m</button>
+          <button onclick="timer.startWithMinutes(75)">75m</button>
+          <button onclick="timer.startWithMinutes(90)">1.5h</button>
+          <button onclick="timer.startWithMinutes(105)">1.75h</button>
+          <button onclick="timer.startWithMinutes(120)">2h</button>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end">
+          <button
+            onclick="timer.start()"
+            style="width: 100%; background-color: #7fecaa; color: black"
+          >
+            Start
+          </button>
+          <button
+            onclick="timer.stop()"
+            style="
+              width: 100%;
+              background-color: #ffe9c3;
+              height: 2.5em;
+              color: black;
+            "
+          >
+            Stop
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    const root = document.documentElement;
+
+    let starttime;
+    let endtime;
+    let beepInterval;
+    let timeinterval;
+
+    let timerDurationMinutes;
+    let timerDurationHours;
+    let timerDurationTotalMinutes;
+
+    const audioCtx = new (window.AudioContext ||
+      window.webkitAudioContext ||
+      window.audioContext)();
+
+    const beep = (duration, frequency, volume, type, callback) => {
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      if (volume) {
+        gainNode.gain.value = volume;
+      }
+      if (frequency) {
+        oscillator.frequency.value = frequency;
+      }
+      if (type) {
+        oscillator.type = type;
+      }
+      if (callback) {
+        oscillator.onended = callback;
+      }
+      oscillator.frequency.value = 300;
+      gainNode.gain.value = 0.05;
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + (duration || 500) / 1000);
+    };
+
+    const getHtmlElements = () => {
+      const hoursSpan = document.getElementById("hoursSpan");
+      const minutesSpan = document.getElementById("minutesSpan");
+      const secondsSpan = document.getElementById("secondsSpan");
+      const progressIndicator = document.getElementById(
+        "timerProgressIndicator"
+      );
+
+      const timerMinutes = document.getElementById("timerMinutes");
+      const timerHours = document.getElementById("timerHours");
+      const alarmHours = document.getElementById("alarmHours");
+      const alarmMinutes = document.getElementById("alarmMinutes");
+
+      return {
+        hoursSpan,
+        minutesSpan,
+        secondsSpan,
+        progressIndicator,
+        timerMinutes,
+        timerHours,
+        alarmHours,
+        alarmMinutes,
+      };
+    };
+
+    const elements = getHtmlElements();
+    const stopBeeping = () => clearInterval(timeinterval);
+
+    const getTimeRemaining = (endTime) => {
+      const total = Date.parse(endTime) - Date.parse(new Date());
+      const seconds = Math.floor((total / 1000) % 60);
+      const minutes = Math.floor((total / 1000 / 60) % 60);
+      const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(total / (1000 * 60 * 60 * 24));
+      return { total, days, hours, minutes, seconds };
+    };
+
+    const { getCurrentWindow, LogicalSize } = window.__TAURI__.window;
+
+    const timer = {
+      reset: () => {
+        getCurrentWindow().setTitle("Timer");
+
+        elements.hoursSpan.innerText = "0";
+        elements.minutesSpan.innerText = "0";
+        elements.secondsSpan.innerText = "0";
+        elements.progressIndicator.value = 0;
+
+        elements.timerHours.value = null;
+        elements.timerMinutes.value = null;
+        elements.alarmHours.value = null;
+        elements.alarmMinutes.value = null;
+
+        timerDurationMinutes = 0;
+        timerDurationHours = 0;
+        timerDurationTotalMinutes = 0;
+      },
+      stop: () => {
+        stopBeeping();
+        timer.reset();
+
+        endtime = undefined;
+        window.document.title = "Timer";
+        document.getElementsByTagName("BODY")[0].classList.value = "";
+      },
+      start: () => {
+        const inputHours =
+          elements.timerHours.value == null ||
+          elements.timerHours.value === 0 ||
+          elements.timerHours.value === ""
+            ? 0
+            : parseInt(elements.timerHours.value);
+
+        const inputMinutes =
+          elements.timerMinutes.value == "" ||
+          elements.timerMinutes.value == null ||
+          elements.timerMinutes.value === 0
+            ? 0
+            : parseInt(elements.timerMinutes.value);
+
+        const timeInMinutes = inputMinutes + inputHours * 60;
+
+        const alarmHours =
+          elements.alarmHours.value == null ||
+          elements.alarmHours.value === 0 ||
+          elements.alarmHours.value === ""
+            ? 0
+            : parseInt(elements.alarmHours.value);
+
+        const alarmMinutes =
+          elements.alarmMinutes.value == "" ||
+          elements.alarmMinutes.value == null ||
+          elements.alarmMinutes.value === 0
+            ? 0
+            : parseInt(elements.alarmMinutes.value);
+
+        const isTimer = inputHours !== 0 || inputMinutes !== 0;
+        const isAlarm = alarmHours !== 0 || alarmMinutes !== 0;
+
+        timer.stop();
+
+        if (isTimer) {
+          const currentTime = Date.parse(new Date());
+          const deadline = new Date(currentTime + timeInMinutes * 60 * 1000);
+          starttime = new Date();
+          endtime = deadline;
+          timer.init();
+        } else if (isAlarm) {
+          const today = new Date();
+          const alarmAt = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate(),
+            alarmHours,
+            alarmMinutes,
+            0
+          );
+          starttime = today;
+          endtime = alarmAt;
+          timer.init();
+        }
+      },
+      init: () => {
+        const endHours = ("0" + endtime.getHours()).slice(-2);
+        const endMinutes = ("0" + endtime.getMinutes()).slice(-2);
+        getCurrentWindow().setTitle(`Timer ${endHours}:${endMinutes}`);
+
+        function updateClock() {
+          const t = getTimeRemaining(endtime);
+
+          const now = new Date();
+          const percentage =
+            100 - Math.round(((now - starttime) / (endtime - starttime)) * 100);
+
+          elements.hoursSpan.innerText = ("0" + t.hours).slice(-2);
+          elements.minutesSpan.innerText = ("0" + t.minutes).slice(-2);
+          elements.secondsSpan.innerText = ("0" + t.seconds).slice(-2);
+          elements.progressIndicator.value = percentage;
+
+          if (t.total <= 0) {
+            beep();
+            document.getElementsByTagName("BODY")[0].classList.value = "blink";
+          }
+        }
+
+        updateClock();
+        timeinterval = setInterval(updateClock, 1000);
+      },
+      startWithMinutes: (minutes) => {
+        timer.stop();
+        const currentTime = Date.parse(new Date());
+        const deadline = new Date(currentTime + minutes * 60 * 1000);
+        starttime = new Date();
+        endtime = deadline;
+        timer.init();
+      },
+    };
+
+    const keyHandler = async (e) => {
+      if (e.target.nodeName !== "TEXTAREA" && e.target.nodeName !== "INPUT") {
+        if (e.key === "n") {
+          window.__TAURI__.core.invoke("create_window");
+        } else if (e.key === "q" || e.key === "§") {
+          const appWindow = getCurrentWindow();
+          const currentSize = await appWindow.innerSize();
+
+          if (currentSize.width >= 300) {
+            appWindow.setSize(new LogicalSize(225, 100));
+          } else {
+            appWindow.setSize(new LogicalSize(480, 255));
+          }
+        } else if (e.key === "Escape") {
+          timer.stop();
+        }
+      } else if (e.target.nodeName === "INPUT" && e.key === "Enter") {
+        timer.start();
+        e.target.blur();
+      }
+    };
+
+    document.addEventListener("keyup", keyHandler, false);
+  </script>
+</html>
