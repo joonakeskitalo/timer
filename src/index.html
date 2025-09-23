@@ -562,9 +562,12 @@
           window.__TAURI__.core.invoke("create_window");
         } else if (e.key === "q" || e.key === "§") {
           const appWindow = getCurrentWindow();
-          const currentSize = await appWindow.innerSize();
+          const scaleFactor = appWindow.scaleFactor;
+          const factor = await appWindow.scaleFactor();
+          const size = await appWindow.innerSize();
+          const logical = size.toLogical(factor);
 
-          if (currentSize.width >= 300) {
+          if (logical.width >= 400) {
             appWindow.setSize(new LogicalSize(225, 100));
           } else {
             appWindow.setSize(new LogicalSize(480, 230));
