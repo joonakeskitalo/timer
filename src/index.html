@@ -229,7 +229,6 @@
             placeholder="Hours..."
             type="number"
             min="0"
-            name=""
             id="timerHours"
             list="alarm-hours"
           />
@@ -237,7 +236,6 @@
             placeholder="Minutes…"
             type="number"
             min="0"
-            name=""
             id="timerMinutes"
             list="alarm-minutes"
           />
@@ -338,21 +336,16 @@
 
         <div style="display: flex; justify-content: flex-end">
           <button
-            onclick="timer.start()"
-            style="width: 100%; background-color: #7fecaa; color: black"
-          >
-            Start
-          </button>
-          <button
-            onclick="timer.stop()"
+            id="timer-toggle-button"
+            onclick="timer.toggle()"
             style="
               width: 100%;
-              background-color: #ffe9c3;
-              height: 2.5em;
-              color: black;
+              background-color: #59a3ff;
+              color: white;
+              height: 32px;
             "
           >
-            Stop
+            Start
           </button>
         </div>
       </div>
@@ -361,6 +354,7 @@
 
   <script>
     const root = document.documentElement;
+    const toggleButton = document.getElementById("timer-toggle-button");
 
     let starttime;
     let endtime;
@@ -438,6 +432,13 @@
     const { getCurrentWindow, LogicalSize } = window.__TAURI__.window;
 
     const timer = {
+      toggle: () => {
+        if (endtime) {
+          timer.stop();
+        } else {
+          timer.start();
+        }
+      },
       reset: () => {
         getCurrentWindow().setTitle("Timer");
 
@@ -458,6 +459,9 @@
       stop: () => {
         stopBeeping();
         timer.reset();
+
+        toggleButton.innerText = "Start";
+        toggleButton.style.backgroundColor = "#59a3ff";
 
         endtime = undefined;
         window.document.title = "Timer";
@@ -524,6 +528,8 @@
         const endHours = ("0" + endtime.getHours()).slice(-2);
         const endMinutes = ("0" + endtime.getMinutes()).slice(-2);
         getCurrentWindow().setTitle(`Timer ${endHours}:${endMinutes}`);
+        toggleButton.innerText = "Stop";
+        toggleButton.style.backgroundColor = "#8e8e93";
 
         function updateClock() {
           const t = getTimeRemaining(endtime);
