@@ -574,6 +574,10 @@
           }
         } else if (e.key === "Escape") {
           timer.stop();
+        } else if (e.key === "t") {
+          const appWindow = getCurrentWindow();
+          const isOnTop = await appWindow.isAlwaysOnTop();
+          await appWindow.setAlwaysOnTop(!isOnTop);
         }
       } else if (e.target.nodeName === "INPUT" && e.key === "Enter") {
         timer.start();

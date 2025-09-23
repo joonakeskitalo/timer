@@ -9,6 +9,7 @@ Simple timer & alarm app in one. You can set the desired duration of a timer or 
 - `n` create new window
 - `Escape`: stop timer
 - `q` or `§`: toggle window size
+- `t` toggle always on top
 - `Enter` when focused on input fields will start the timer
 
 ## Installation
