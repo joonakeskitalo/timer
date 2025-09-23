@@ -12,7 +12,9 @@
       {
         "title": "Timer",
         "width": 480,
-        "height": 230
+        "height": 230,
+        "maxHeight": 230,
+        "maxWidth": 480
       }
     ],
     "security": {
