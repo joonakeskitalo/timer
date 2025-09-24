@@ -603,6 +603,8 @@
       } else if (e.target.nodeName === "INPUT" && e.key === "Enter") {
         timer.start();
         e.target.blur();
+      } else if (e.target.nodeName === "TEXTAREA" && e.key === "Escape") {
+        document.activeElement.blur();
       }
     };
 
