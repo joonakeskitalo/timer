@@ -22,6 +22,8 @@
     }
   },
   "bundle": {
+    "copyright": "Joona Keskitalo",
+    "homepage": "https://joonakeskitalo.github.io/",
     "active": true,
     "targets": "all",
     "icon": [
