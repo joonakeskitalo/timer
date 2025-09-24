@@ -364,6 +364,9 @@
     let timerDurationHours;
     let timerDurationTotalMinutes;
 
+    let isAlwaysOnTop = false;
+    let existingTitle = "Timer";
+
     const audioCtx = new (window.AudioContext ||
       window.webkitAudioContext ||
       window.audioContext)();
@@ -439,7 +442,7 @@
         }
       },
       reset: () => {
-        getCurrentWindow().setTitle("Timer");
+        updateTitle();
 
         elements.hoursSpan.innerText = "0";
         elements.minutesSpan.innerText = "0";
@@ -458,6 +461,7 @@
       stop: () => {
         stopBeeping();
         timer.reset();
+        updateTitle("Timer");
 
         toggleButton.innerText = "Start";
         toggleButton.style.backgroundColor = "#59a3ff";
@@ -526,7 +530,8 @@
       init: () => {
         const endHours = ("0" + endtime.getHours()).slice(-2);
         const endMinutes = ("0" + endtime.getMinutes()).slice(-2);
-        getCurrentWindow().setTitle(`Timer ${endHours}:${endMinutes}`);
+        updateTitle(`Timer ${endHours}:${endMinutes}`);
+
         toggleButton.innerText = "Stop";
         toggleButton.style.backgroundColor = "#8e8e93";
 
@@ -561,6 +566,15 @@
       },
     };
 
+    const updateTitle = async (newTitle) => {
+      if (newTitle) {
+        existingTitle = newTitle;
+      }
+      const appWindow = getCurrentWindow();
+      const title = isAlwaysOnTop ? `📌 ${existingTitle}` : existingTitle;
+      appWindow.setTitle(title);
+    };
+
     const keyHandler = async (e) => {
       if (e.target.nodeName !== "TEXTAREA" && e.target.nodeName !== "INPUT") {
         if (e.key === "n") {
@@ -577,12 +591,14 @@
           } else {
             appWindow.setSize(new LogicalSize(480, 230));
           }
-        } else if (e.key === "Escape") {
+        } else if (e.key === "Escape" || e.key === "r") {
           timer.stop();
         } else if (e.key === "t") {
           const appWindow = getCurrentWindow();
           const isOnTop = await appWindow.isAlwaysOnTop();
-          await appWindow.setAlwaysOnTop(!isOnTop);
+          isAlwaysOnTop = !isOnTop;
+          await appWindow.setAlwaysOnTop(isAlwaysOnTop);
+          updateTitle();
         }
       } else if (e.target.nodeName === "INPUT" && e.key === "Enter") {
         timer.start();
