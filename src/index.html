@@ -407,6 +407,8 @@
       const alarmHours = document.getElementById("alarmHours");
       const alarmMinutes = document.getElementById("alarmMinutes");
 
+      const noteTextArea = document.getElementById("noteTextArea");
+
       return {
         hoursSpan,
         minutesSpan,
@@ -416,6 +418,7 @@
         timerHours,
         alarmHours,
         alarmMinutes,
+        noteTextArea,
       };
     };
 
@@ -579,6 +582,8 @@
       if (e.target.nodeName !== "TEXTAREA" && e.target.nodeName !== "INPUT") {
         if (e.key === "n") {
           window.__TAURI__.core.invoke("create_window");
+        } else if (e.key === "f") {
+          elements.noteTextArea.focus();
         } else if (e.key === "q" || e.key === "§") {
           const appWindow = getCurrentWindow();
           const scaleFactor = appWindow.scaleFactor;
