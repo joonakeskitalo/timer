@@ -440,7 +440,13 @@
 
     const timer = {
       toggle: () => {
-        if (endtime) {
+        if (
+          endtime &&
+          elements.alarmHours.value === "" &&
+          elements.alarmMinutes.value === "" &&
+          elements.hoursSpan.value === "" &&
+          elements.minutesSpan.value === ""
+        ) {
           timer.stop();
         } else {
           timer.start();
