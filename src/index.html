@@ -437,6 +437,8 @@
     };
 
     const { getCurrentWindow, LogicalSize } = window.__TAURI__.window;
+    const currentWindow = getCurrentWindow();
+    let hasBeenBroughtToFocus = false;
 
     const timer = {
       toggle: () => {
@@ -453,6 +455,7 @@
         }
       },
       reset: () => {
+        hasBeenBroughtToFocus = false;
         updateTitle();
 
         elements.hoursSpan.innerText = "0";
@@ -482,6 +485,8 @@
         document.getElementsByTagName("BODY")[0].classList.value = "";
       },
       start: () => {
+        hasBeenBroughtToFocus = false;
+
         const inputHours =
           elements.timerHours.value == null ||
           elements.timerHours.value === 0 ||
@@ -539,6 +544,9 @@
         }
       },
       init: () => {
+        hasBeenBroughtToFocus = false;
+        const appWindow = getCurrentWindow();
+
         const endHours = ("0" + endtime.getHours()).slice(-2);
         const endMinutes = ("0" + endtime.getMinutes()).slice(-2);
         updateTitle(`Timer ${endHours}:${endMinutes}`);
@@ -561,6 +569,11 @@
           if (t.total <= 0) {
             beep();
             document.getElementsByTagName("BODY")[0].classList.value = "blink";
+
+            if (!hasBeenBroughtToFocus) {
+              hasBeenBroughtToFocus = true;
+              currentWindow.setFocus();
+            }
           }
         }
 
